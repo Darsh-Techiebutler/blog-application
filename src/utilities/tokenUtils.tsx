@@ -9,7 +9,6 @@ interface DecodedToken extends JwtPayload {
 export const getUserRoleFromToken = (token: string | null): string | null => {
     if (!token) return null;
     try {
-        // Decode the token and cast it to DecodedToken type
         const decodedToken: DecodedToken = jwtDecode(token);
         return decodedToken.role || null;
     } catch (error) {
