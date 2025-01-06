@@ -12,6 +12,7 @@ const authSlice = createSlice({
     reducers: {
         loginSuccess: (state, action) => {
             state.user = action.payload;
+            console.log('Dispatched loginSuccess with data:', action.payload);  // Log dispatched action data
             state.error = null;
         },
         setError: (state, action) => {
@@ -26,6 +27,6 @@ const authSlice = createSlice({
     },
 });
 
-export const { loginSuccess, setError,logout } = authSlice.actions;
+export const { loginSuccess, setError, logout } = authSlice.actions;
 
 export default authSlice.reducer;

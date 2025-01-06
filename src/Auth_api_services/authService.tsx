@@ -37,9 +37,8 @@ export const loginUser = async (email: string, password: string, dispatch: any) 
         // Dispatch the loginSuccess action directly with user data and token
         localStorage.setItem('role', data.role);
         localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data));
 
-        
+
         return data; // Optionally return the data if needed
     } catch (error) {
         console.error(error);

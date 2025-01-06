@@ -7,6 +7,7 @@ import DarkModeIcon from '@mui/icons-material/DarkMode';
 import { toggleTheme } from '../../reducer/theme';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { logout } from '../../reducer/authReducer'; // Import logout action
+import { loginSuccess } from '../../reducer/authReducer'; // Import loginSuccess action
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -15,26 +16,26 @@ const Header = () => {
 
   // Correcting the path to access user data
   const userinfo = useSelector((state: any) => state.auth.user);
-  const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
-  const [openMenu, setOpenMenu] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   useEffect(() => {
     // Check if the user is logged in by verifying localStorage and reset the user info if not available
     const user = localStorage.getItem('user');
     const token = localStorage.getItem('token');
-    
-    if (!user || !token) {
+
+    if (user && token) {
+      dispatch(loginSuccess({ user: JSON.parse(user), token })); // Dispatch loginSuccess action with user data
+    } else {
       dispatch(logout()); // Clear user state if no user or token is found
     }
   }, [dispatch]);
 
-  const handleAvatarClick = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleAvatarClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget); // Set the anchor element to the clicked avatar
-    setOpenMenu(!openMenu); // Toggle the menu visibility
   };
 
   const handleCloseMenu = () => {
-    setOpenMenu(false); // Close the menu when it loses focus
+    setAnchorEl(null); // Close the menu when it loses focus
   };
 
   // Logout function
@@ -43,8 +44,8 @@ const Header = () => {
     console.log('Logging out...');
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-    setOpenMenu(false); // Close the menu after logout
-    navigate('/login'); // Redirect to login
+    handleCloseMenu();
+    navigate('/login');
   };
 
   return (
@@ -64,7 +65,7 @@ const Header = () => {
               />
               <Menu
                 anchorEl={anchorEl}
-                open={openMenu}
+                open={Boolean(anchorEl)}
                 onClose={handleCloseMenu}
                 anchorOrigin={{
                   vertical: 'bottom',
@@ -99,7 +100,7 @@ const Header = () => {
             />
           )}
         </Box>
-        <Tooltip title="Toggle light/dark theme">
+        <Tooltip title="Toggle light /dark theme">
           <IconButton onClick={() => dispatch(toggleTheme())} color="inherit">
             {theme === 'light' ? <LightModeIcon /> : <DarkModeIcon />}
           </IconButton>

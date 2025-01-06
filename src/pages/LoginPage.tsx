@@ -21,24 +21,16 @@ const LoginPage = () => {
 
     try {
       const data = await loginUser(email, password, dispatch);
-      if (data && data.role) {
-        // Pass the role to the parent component
-        // onLogin(data.role);
-        dispatch(loginSuccess(data));
-
-        // Use setTimeout to ensure Redux state is updated before navigation
-        setTimeout(() => {
-          // Navigate based on the role
-          if (data.role === 'admin') {
-            navigate('/admin');
-          } else if (data.role === 'superadmin') {
-            navigate('/superadmin');
-          }
-        }, 200);  // Wait for Redux state update before redirecting
-      } else {
-        throw new Error('Invalid login response');
+      dispatch(loginSuccess(data));
+      console.log('Logged in:', data);
+      if (data.role === 'admin') {
+        navigate('/admin');
+      } else if (data.role === 'superadmin') {
+        navigate('/superadmin');
       }
-    } catch (error) {
+    }
+    // Wait for Redux state update before redirecting
+    catch (error) {
       console.error('Login failed:', error);
       setErrorMessage('Login failed. Please check your credentials and try again.');
     }

@@ -20,7 +20,7 @@ const App = () => {
       setToken(storedToken);
       setRole(storedRole);
     }
-  }, []); // Only runs once on component mount
+  }, []);
 
 
   // const handleRoleChange = (newRole: string) => {
