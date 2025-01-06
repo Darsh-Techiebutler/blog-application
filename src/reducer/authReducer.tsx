@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 // Define the initial state
 const initialState = {
-    user: null,        // Store the user data (e.g., role, token)
+    user: null,
     isAuthenticated: false,
     loading: false,    // Track loading state for login
     error: null,       // Store any error messages
@@ -14,9 +14,7 @@ const authSlice = createSlice({
     initialState,
     reducers: {
         loginSuccess: (state, action) => {
-            state.user = action.payload;  // Store the user data
-            state.isAuthenticated = true;
-            state.loading = false;
+            state.user = action.payload;
             state.error = null;
         },
         loginFailure: (state, action) => {

@@ -5,21 +5,32 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import LoginPage from './pages/LoginPage';
 import { AdminDashboard } from './admin/AdminDashboard';
 import { SuperAdminDashboard } from './superadmin/SuperAdminDashboard';
-// import { toggleTheme } from './reducer/theme';  // Assuming the theme toggle action is in the theme reducer
 
 const App = () => {
   const [role, setRole] = useState<string | null>(null);
-  const theme = useSelector((state: any) => state.theme.theme);
+  const [token, setToken] = useState<string | null>(null); // Token to check if user is authenticated
+  const theme = useSelector((state: any) => state.theme.theme);  // Get theme from Redux
   const dispatch = useDispatch();
 
   useEffect(() => {
+    const storedToken = localStorage.getItem('token');
     const storedRole = localStorage.getItem('role');
-    setRole(storedRole);
+    
+    if (storedToken && storedRole) {
+      setToken(storedToken);
+      setRole(storedRole);
+    }
   }, []);
 
   const handleRoleChange = (newRole: string) => {
+    const token = localStorage.getItem('token');
     localStorage.setItem('role', newRole);
     setRole(newRole);
+
+    // Ensure token is still valid (you could have an expiry check here if needed)
+    if (token) {
+      localStorage.setItem('token', token);
+    }
   };
 
   // Define light and dark themes
@@ -43,20 +54,20 @@ const App = () => {
           <Route
             path="/admin"
             element={
-              role === 'admin' ? (
+              token && role === 'admin' ? (
                 <AdminDashboard />
               ) : (
-                <Navigate to="/login" replace />
+                <Navigate to="/login" replace /> // Redirect to login if token is missing or role is invalid
               )
             }
           />
           <Route
             path="/superadmin"
             element={
-              role === 'superadmin' ? (
+              token && role === 'superadmin' ? ( // Only allow access if token and role are valid
                 <SuperAdminDashboard />
               ) : (
-                <Navigate to="/login" replace />
+                <Navigate to="/login" replace /> // Redirect to login if token is missing or role is invalid
               )
             }
           />
