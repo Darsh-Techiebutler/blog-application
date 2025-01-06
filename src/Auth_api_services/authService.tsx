@@ -34,10 +34,12 @@ export const loginUser = async (email: string, password: string, dispatch: any) 
         }
 
         const data: LoginResponse = await response.json();
-        console.log(data)
         // Dispatch the loginSuccess action directly with user data and token
-        dispatch(loginSuccess({ user: data.email, token: data.token }));
+        localStorage.setItem('role', data.role);
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data));
 
+        
         return data; // Optionally return the data if needed
     } catch (error) {
         console.error(error);

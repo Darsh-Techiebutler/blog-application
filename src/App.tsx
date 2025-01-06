@@ -8,8 +8,8 @@ import { SuperAdminDashboard } from './superadmin/SuperAdminDashboard';
 import ProtectedRoute from './ProtectedRoute';
 
 const App = () => {
-  const [role, setRole] = useState<string | null>(localStorage.getItem('role')); // Initialize from localStorage
-  const [token, setToken] = useState<string | null>(localStorage.getItem('token')); // Initialize from localStorage
+  const [role, setRole] = useState<string | null>(localStorage.getItem('role'));
+  const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
   const theme = useSelector((state: any) => state.theme.theme);
   const dispatch = useDispatch();
 
@@ -23,15 +23,15 @@ const App = () => {
   }, []); // Only runs once on component mount
 
 
-  const handleRoleChange = (newRole: string) => {
-    const token = localStorage.getItem('token');
-    localStorage.setItem('role', newRole);
-    setRole(newRole);
+  // const handleRoleChange = (newRole: string) => {
+  //   const token = localStorage.getItem('token');
+  //   localStorage.setItem('role', newRole);
+  //   setRole(newRole);
 
-    if (token) {
-      localStorage.setItem('token', token);
-    }
-  };
+  //   if (token) {
+  //     localStorage.setItem('token', token);
+  //   }
+  // };
 
   // Define light and dark themes
   const lightTheme = createTheme({
@@ -50,7 +50,7 @@ const App = () => {
     <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
       <Router>
         <Routes>
-          <Route path="/login" element={<LoginPage onLogin={handleRoleChange} />} />
+          <Route path="/login" element={<LoginPage />} />
           <Route
             path="/admin"
             element={

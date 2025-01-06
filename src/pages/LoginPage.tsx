@@ -6,10 +6,10 @@ import { loginUser } from '../Auth_api_services/authService';  // Import loginUs
 import { loginSuccess } from '../reducer/authReducer';  // Import Redux actions
 
 type LoginPageProps = {
-  onLogin: (role: string) => void
+  onLogin: (role: string) => void;
 };
 
-const LoginPage = ({ onLogin }: LoginPageProps) => {
+const LoginPage = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
@@ -23,16 +23,18 @@ const LoginPage = ({ onLogin }: LoginPageProps) => {
       const data = await loginUser(email, password, dispatch);
       if (data && data.role) {
         // Pass the role to the parent component
-        onLogin(data.role);
-        // console.log(data)
+        // onLogin(data.role);
         dispatch(loginSuccess(data));
 
-        // Navigate based on the role
-        if (data.role === 'admin') {
-          navigate('/admin');
-        } else if (data.role === 'superadmin') {
-          navigate('/superadmin');
-        }
+        // Use setTimeout to ensure Redux state is updated before navigation
+        setTimeout(() => {
+          // Navigate based on the role
+          if (data.role === 'admin') {
+            navigate('/admin');
+          } else if (data.role === 'superadmin') {
+            navigate('/superadmin');
+          }
+        }, 200);  // Wait for Redux state update before redirecting
       } else {
         throw new Error('Invalid login response');
       }

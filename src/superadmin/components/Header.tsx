@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
-import { AppBar, Toolbar, Typography, Avatar, Box, IconButton, Tooltip, Menu, MenuItem, Divider } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { AppBar, Toolbar, Typography, Avatar, Box, IconButton, Tooltip, Menu, MenuItem } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import { toggleTheme } from '../../reducer/theme';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { logout } from '../../reducer/authReducer'; // Import logout action
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -13,18 +15,36 @@ const Header = () => {
 
   // Correcting the path to access user data
   const userinfo = useSelector((state: any) => state.auth.user);
-  console.log(userinfo);
+  const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
+  const [openMenu, setOpenMenu] = useState(false);
 
-  // State for managing avatar menu visibility
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const openMenu = Boolean(anchorEl);
+  useEffect(() => {
+    // Check if the user is logged in by verifying localStorage and reset the user info if not available
+    const user = localStorage.getItem('user');
+    const token = localStorage.getItem('token');
+    
+    if (!user || !token) {
+      dispatch(logout()); // Clear user state if no user or token is found
+    }
+  }, [dispatch]);
 
-  const handleAvatarClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
+  const handleAvatarClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    setAnchorEl(event.currentTarget); // Set the anchor element to the clicked avatar
+    setOpenMenu(!openMenu); // Toggle the menu visibility
   };
 
   const handleCloseMenu = () => {
-    setAnchorEl(null);
+    setOpenMenu(false); // Close the menu when it loses focus
+  };
+
+  // Logout function
+  const handleLogout = () => {
+    dispatch(logout());
+    console.log('Logging out...');
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    setOpenMenu(false); // Close the menu after logout
+    navigate('/login'); // Redirect to login
   };
 
   return (
@@ -33,78 +53,58 @@ const Header = () => {
         <Typography variant="h6" noWrap sx={{ flexGrow: 1 }}>
           Super Admin Dashboard
         </Typography>
-
-        <Box display="flex" alignItems="center">
-          <Tooltip title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}>
-            <IconButton onClick={() => dispatch(toggleTheme())} color="inherit" sx={{ mr: 2 }}>
-              {theme === 'light' ? <DarkModeIcon /> : <LightModeIcon />}
-            </IconButton>
-          </Tooltip>
-
-          {/* Display User's Avatar or Name */}
-          <Box display="flex" alignItems="center" sx={{ ml: 2 }}>
-            {userinfo && userinfo.name ? (
-              <>
-                <Typography variant="body2" sx={{ mr: 2 }}>
-                  {userinfo.name}
-                </Typography>
-                <Avatar
-                  alt={userinfo.name}
-                  src={userinfo.avatarUrl || '/static/images/avatar/1.jpg'}
-                  onClick={handleAvatarClick} 
-                  sx={{ cursor: 'pointer' }}
-                />
-                <Menu
-                  anchorEl={anchorEl}
-                  open={openMenu}
-                  onClose={handleCloseMenu}
-                  anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'center',
-                  }}
-                  transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'center',
-                  }}
-                >
-                  <Box sx={{ minWidth: 200 }}>
-                    <MenuItem disabled>
-                      <Typography variant="h6">{userinfo.name}</Typography>
-                    </MenuItem>
-                    <MenuItem disabled>{userinfo.email}</MenuItem>
-                    <MenuItem disabled>{`Role: ${userinfo.role}`}</MenuItem>
-                    <Divider sx={{ my: 1 }} />
-                    <MenuItem onClick={handleCloseMenu}>Logout</MenuItem>
-                  </Box>
-                </Menu>
-              </>
-            ) : (
+        <Box display="flex" alignItems="center" sx={{ ml: 2 }}>
+          {userinfo && userinfo.name ? (
+            <>
               <Avatar
-                alt="User Avatar"
-                src="/static/images/avatar/1.jpg"
-                onClick={handleAvatarClick} // Open menu on click
+                alt={userinfo.name}
+                src={userinfo.avatarUrl || '/static/images/avatar/1.jpg'}
+                onClick={handleAvatarClick}
                 sx={{ cursor: 'pointer' }}
               />
-            )}
-          </Box>
-        </Box>
-      </Toolbar>
+              <Menu
+                anchorEl={anchorEl}
+                open={openMenu}
+                onClose={handleCloseMenu}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'center',
+                }}
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'center',
+                }}
+              >
+                <Box sx={{ minWidth: 200 }}>
+                  {/* Display user info: email and role */}
+                  <MenuItem sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                    <Typography variant="body2">{userinfo.email}</Typography>
+                    <Typography variant="body2" color="textSecondary">{userinfo.role}</Typography>
+                  </MenuItem>
 
-      <Menu
-        anchorEl={anchorEl}
-        open={openMenu}
-        onClose={handleCloseMenu}
-      >
-        <MenuItem disabled>
-          <Typography variant="body2">{userinfo?.name}</Typography>
-        </MenuItem>
-        <MenuItem disabled>
-          <Typography variant="body2">{userinfo?.role}</Typography>
-        </MenuItem>
-        <MenuItem disabled>
-          <Typography variant="body2">{userinfo?.email}</Typography>
-        </MenuItem>
-      </Menu>
+                  {/* Logout icon */}
+                  <MenuItem onClick={handleLogout} sx={{ display: 'flex', alignItems: 'center' }}>
+                    <LogoutIcon sx={{ mr: 1 }} /> {/* Logout Icon */}
+                    Logout
+                  </MenuItem>
+                </Box>
+              </Menu>
+            </>
+          ) : (
+            <Avatar
+              alt="User Avatar"
+              src="/static/images/avatar/1.jpg"
+              onClick={handleAvatarClick} // Open menu on click
+              sx={{ cursor: 'pointer' }}
+            />
+          )}
+        </Box>
+        <Tooltip title="Toggle light/dark theme">
+          <IconButton onClick={() => dispatch(toggleTheme())} color="inherit">
+            {theme === 'light' ? <LightModeIcon /> : <DarkModeIcon />}
+          </IconButton>
+        </Tooltip>
+      </Toolbar>
     </AppBar>
   );
 };
