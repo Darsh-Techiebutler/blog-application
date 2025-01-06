@@ -1,6 +1,7 @@
 import axios from 'axios';
-import { Dispatch, UnknownAction } from 'redux';
-import { loginSuccess, loginFailure } from '../reducer/authReducer';
+import { Dispatch } from 'redux';
+import { loginSuccess } from '../reducer/authReducer'; // Import your loginSuccess action
+// import { loginSuccess, loginFailure } from '../reducer/authReducer';
 const API_URL = 'http://localhost:1717/api/auth';
 // Define types for response
 interface LoginResponse {
@@ -10,7 +11,6 @@ interface LoginResponse {
 }
 
 // Action types
-const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 const LOGOUT = 'LOGOUT';
 
 
@@ -18,7 +18,8 @@ const LOGOUT = 'LOGOUT';
 //     (dispatch: Dispatch, email: string, password: string): Promise<LoginResponse | undefined>;
 // }
 
-export const loginUser = async (email: string, password: string) => {
+
+export const loginUser = async (email: string, password: string, dispatch: any) => {
     try {
         const response = await fetch(`${API_URL}/login`, {
             method: 'POST',
@@ -33,14 +34,14 @@ export const loginUser = async (email: string, password: string) => {
         }
 
         const data: LoginResponse = await response.json();
-        // Store the role and token in localStorage or sessionStorage
-        localStorage.setItem('role', data.role);
-        localStorage.setItem('token', data.token);
+        console.log(data)
+        // Dispatch the loginSuccess action directly with user data and token
+        dispatch(loginSuccess({ user: data.email, token: data.token }));
 
-        // dispatch(loginSuccess(data));
-        return data;
+        return data; // Optionally return the data if needed
     } catch (error) {
-        // dispatch(loginFailure((error as Error).message));  // Dispatch error if login fails
+        console.error(error);
+        throw new Error('Login failed');
     }
 };
 

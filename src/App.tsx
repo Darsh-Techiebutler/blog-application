@@ -5,29 +5,29 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import LoginPage from './pages/LoginPage';
 import { AdminDashboard } from './admin/AdminDashboard';
 import { SuperAdminDashboard } from './superadmin/SuperAdminDashboard';
+import ProtectedRoute from './ProtectedRoute';
 
 const App = () => {
-  const [role, setRole] = useState<string | null>(null);
-  const [token, setToken] = useState<string | null>(null); // Token to check if user is authenticated
-  const theme = useSelector((state: any) => state.theme.theme);  // Get theme from Redux
+  const [role, setRole] = useState<string | null>(localStorage.getItem('role')); // Initialize from localStorage
+  const [token, setToken] = useState<string | null>(localStorage.getItem('token')); // Initialize from localStorage
+  const theme = useSelector((state: any) => state.theme.theme);
   const dispatch = useDispatch();
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     const storedRole = localStorage.getItem('role');
-    
     if (storedToken && storedRole) {
       setToken(storedToken);
       setRole(storedRole);
     }
-  }, []);
+  }, []); // Only runs once on component mount
+
 
   const handleRoleChange = (newRole: string) => {
     const token = localStorage.getItem('token');
     localStorage.setItem('role', newRole);
     setRole(newRole);
 
-    // Ensure token is still valid (you could have an expiry check here if needed)
     if (token) {
       localStorage.setItem('token', token);
     }
@@ -54,21 +54,17 @@ const App = () => {
           <Route
             path="/admin"
             element={
-              token && role === 'admin' ? (
+              <ProtectedRoute role="admin" userRole={role} token={token}>
                 <AdminDashboard />
-              ) : (
-                <Navigate to="/login" replace /> // Redirect to login if token is missing or role is invalid
-              )
+              </ProtectedRoute>
             }
           />
           <Route
             path="/superadmin"
             element={
-              token && role === 'superadmin' ? ( // Only allow access if token and role are valid
+              <ProtectedRoute role="superadmin" userRole={role} token={token}>
                 <SuperAdminDashboard />
-              ) : (
-                <Navigate to="/login" replace /> // Redirect to login if token is missing or role is invalid
-              )
+              </ProtectedRoute>
             }
           />
           <Route path="*" element={<Navigate to="/login" replace />} />

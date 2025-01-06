@@ -3,13 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { Button, TextField, Typography, Container, Paper, AppBar, Toolbar } from '@mui/material';
 import { useDispatch } from 'react-redux';  // Import useDispatch from Redux
 import { loginUser } from '../Auth_api_services/authService';  // Import loginUser function
-import { loginSuccess, loginFailure } from '../reducer/authReducer';  // Import Redux actions
+import { loginSuccess } from '../reducer/authReducer';  // Import Redux actions
 
-interface LoginPageProps {
-  onLogin: (role: string) => void;
-}
+type LoginPageProps = {
+  onLogin: (role: string) => void
+};
 
-const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
+const LoginPage = ({ onLogin }: LoginPageProps) => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
@@ -20,13 +20,12 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
     event.preventDefault();
 
     try {
-      const data = await loginUser(email, password);
+      const data = await loginUser(email, password, dispatch);
       if (data && data.role) {
-        // Dispatch loginSuccess with user data
-        dispatch(loginSuccess(data));
-
         // Pass the role to the parent component
         onLogin(data.role);
+        // console.log(data)
+        dispatch(loginSuccess(data));
 
         // Navigate based on the role
         if (data.role === 'admin') {
@@ -35,12 +34,10 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
           navigate('/superadmin');
         }
       } else {
-        // Handle case where data or role is missing
         throw new Error('Invalid login response');
       }
     } catch (error) {
       console.error('Login failed:', error);
-      dispatch(loginFailure('Login failed. Please check your credentials and try again.'));
       setErrorMessage('Login failed. Please check your credentials and try again.');
     }
   };
