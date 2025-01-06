@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage';
 import { AdminDashboard } from './admin/AdminDashboard';
 import { SuperAdminDashboard } from './superadmin/SuperAdminDashboard';
 import ProtectedRoute from './ProtectedRoute';
+import UsersList  from './superadmin/components/UsersList';  // Assuming UsersList is a separate page
 
 const App = () => {
   const [role, setRole] = useState<string | null>(localStorage.getItem('role'));
@@ -21,17 +22,6 @@ const App = () => {
       setRole(storedRole);
     }
   }, []);
-
-
-  // const handleRoleChange = (newRole: string) => {
-  //   const token = localStorage.getItem('token');
-  //   localStorage.setItem('role', newRole);
-  //   setRole(newRole);
-
-  //   if (token) {
-  //     localStorage.setItem('token', token);
-  //   }
-  // };
 
   // Define light and dark themes
   const lightTheme = createTheme({
@@ -64,6 +54,14 @@ const App = () => {
             element={
               <ProtectedRoute role="superadmin" userRole={role} token={token}>
                 <SuperAdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="superadmin/users"
+            element={
+              <ProtectedRoute role="superadmin" userRole={role} token={token}>
+                <UsersList token={token || ''} />
               </ProtectedRoute>
             }
           />

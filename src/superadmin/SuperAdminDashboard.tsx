@@ -1,16 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
-import DataTable from './components/DataTable';
 import { Box, Grid, useMediaQuery } from '@mui/material';
+import UsersList from './components/UsersList';
 
 const SuperAdminDashboard = () => {
   const isMobile = useMediaQuery('(max-width:600px)');
+  const [showUsersList, setShowUsersList] = useState(false);
+
+  const handleUserClick = () => {
+    setShowUsersList(!showUsersList); // Toggle the UsersList display
+  };
 
   return (
     <Grid container>
       <Grid item xs={isMobile ? 2 : 3} sx={{ display: { xs: 'none', sm: 'block' } }}>
-        <Sidebar />
+        <Sidebar onUserClick={handleUserClick} />
       </Grid>
 
       {/* Main Content */}
@@ -26,7 +31,7 @@ const SuperAdminDashboard = () => {
         }}
       >
         <Header />
-        <DataTable />
+        <UsersList token={''} />
       </Grid>
     </Grid>
   );
