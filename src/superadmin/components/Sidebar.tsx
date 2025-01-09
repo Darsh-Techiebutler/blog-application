@@ -1,24 +1,36 @@
 import React, { useState } from 'react';
-import { Box, List, ListItemButton, ListItemIcon, ListItemText, IconButton, Collapse } from '@mui/material';
-import { Link } from 'react-router-dom';  // Import Link for navigation
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import PersonIcon from '@mui/icons-material/Person';
-import GroupsIcon from '@mui/icons-material/Groups';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import MenuIcon from '@mui/icons-material/Menu';
+import {
+  Box,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  IconButton,
+  Collapse,
+} from '@mui/material';
+import { Link, useLocation } from 'react-router-dom';
+import {
+  Dashboard as DashboardIcon,
+  Person as PersonIcon,
+  Groups as GroupsIcon,
+  PersonAdd as PersonAddIcon,
+  Article as ArticleIcon,
+  AddCircle as AddCircleIcon,
+  PendingActions as PendingActionsIcon,
+  ArrowDropDown as ArrowDropDownIcon,
+  ArrowRight as ArrowRightIcon,
+  Menu as MenuIcon,
+} from '@mui/icons-material';
 import { useSelector } from 'react-redux';
-// import UsersList from './UsersList';
 
-const Sidebar = ({ onUserClick }: { onUserClick: () => void }) => {  // Pass user click handler as prop
+const Sidebar = () => {
   const [openUser, setOpenUser] = useState(false);
-  const token = useSelector((state: any) => state.auth.token); // Get the token from Redux or localStorage
+  const [openBlog, setOpenBlog] = useState(false);
+  const location = useLocation();
+  const token = useSelector((state: any) => state.auth.token);
 
-  const handleUserClick = () => {
-    setOpenUser(!openUser);
-    onUserClick();  // Call passed handler on click
-  };
+  const handleUserClick = () => setOpenUser(!openUser);
+  const handleBlogClick = () => setOpenBlog(!openBlog);
 
   return (
     <Box
@@ -34,6 +46,7 @@ const Sidebar = ({ onUserClick }: { onUserClick: () => void }) => {  // Pass use
         transition: 'width 0.3s ease-in-out',
       }}
     >
+      {/* Sidebar Header */}
       <Box
         sx={{
           padding: 2,
@@ -47,48 +60,116 @@ const Sidebar = ({ onUserClick }: { onUserClick: () => void }) => {  // Pass use
         Super Admin
       </Box>
 
+      {/* Sidebar Navigation */}
       <List>
-        <ListItemButton component={Link} to="/admin"> {/* Use Link for navigation */}
+        {/* Dashboard */}
+        <ListItemButton
+          component={Link}
+          to="/admin"
+          selected={location.pathname === '/admin'}
+        >
           <ListItemIcon>
             <DashboardIcon />
           </ListItemIcon>
           <ListItemText primary="Dashboard" />
         </ListItemButton>
 
+        {/* User Management */}
         <ListItemButton onClick={handleUserClick}>
           <ListItemIcon>
             <PersonIcon />
           </ListItemIcon>
-          <ListItemText primary="User" />
+          <ListItemText primary="User Management" />
           {openUser ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
         </ListItemButton>
-
         <Collapse in={openUser} timeout="auto" unmountOnExit>
           <Box sx={{ pl: 4 }}>
-            <ListItemButton component={Link} to="/superadmin/users">
+            <ListItemButton
+              component={Link}
+              to="/superadmin/users"
+              selected={location.pathname === '/superadmin/users'}
+            >
               <ListItemIcon>
                 <GroupsIcon />
               </ListItemIcon>
               <ListItemText primary="All Users" />
             </ListItemButton>
-            <ListItemButton component={Link} to="/admin/add-user">
+            <ListItemButton
+              component={Link}
+              to="/superadmin/add-user"
+              selected={location.pathname === '/superadmin/add-user'}
+            >
               <ListItemIcon>
                 <PersonAddIcon />
               </ListItemIcon>
               <ListItemText primary="Add User" />
             </ListItemButton>
+            <ListItemButton
+              component={Link}
+              to="/admin/pending-users"
+              selected={location.pathname === '/admin/pending-users'}
+            >
+              <ListItemIcon>
+                <PendingActionsIcon />
+              </ListItemIcon>
+              <ListItemText primary="Pending Users" />
+            </ListItemButton>
+          </Box>
+        </Collapse>
+
+        {/* Blog Management */}
+        <ListItemButton onClick={handleBlogClick}>
+          <ListItemIcon>
+            <ArticleIcon />
+          </ListItemIcon>
+          <ListItemText primary="Blog Management" />
+          {openBlog ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
+        </ListItemButton>
+        <Collapse in={openBlog} timeout="auto" unmountOnExit>
+          <Box sx={{ pl: 4 }}>
+            <ListItemButton
+              component={Link}
+              to="/admin/blogs"
+              selected={location.pathname === '/admin/blogs'}
+            >
+              <ListItemIcon>
+                <ArticleIcon />
+              </ListItemIcon>
+              <ListItemText primary="All Blogs" />
+            </ListItemButton>
+            <ListItemButton
+              component={Link}
+              to="/admin/add-blog"
+              selected={location.pathname === '/admin/add-blog'}
+            >
+              <ListItemIcon>
+                <AddCircleIcon />
+              </ListItemIcon>
+              <ListItemText primary="Add Blog" />
+            </ListItemButton>
+            <ListItemButton
+              component={Link}
+              to="/admin/pending-blogs"
+              selected={location.pathname === '/admin/pending-blogs'}
+            >
+              <ListItemIcon>
+                <PendingActionsIcon />
+              </ListItemIcon>
+              <ListItemText primary="Pending Blogs" />
+            </ListItemButton>
           </Box>
         </Collapse>
       </List>
 
+      {/* Menu Icon for Mobile */}
       <IconButton
         sx={{
-          display: 'block', // Show the menu button on mobile
+          display: 'block',
           position: 'absolute',
           top: 16,
           left: 16,
         }}
-        onClick={() => {}}
+        onClick={() => { }}
       >
         <MenuIcon />
       </IconButton>
