@@ -1,19 +1,18 @@
-// Import necessary dependencies
-import React from "react";
-import { Box, Typography, Button, Container } from "@mui/material";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import { useNavigate } from "react-router-dom";
+import React from 'react';
+import { Container, Typography, Button } from '@mui/material';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import { useNavigate } from 'react-router-dom';
 
-const NotFoundPage = () => {
-    const navigate = useNavigate();
+const FullPageError = () => {
+    const navigate = useNavigate(); // Hook is used within the component
 
     const handleGoHome = () => {
-        navigate("/login"); // Redirect to the homepage
+        navigate('/login'); // Direct navigation to login page
     };
 
     return (
         <Container
-            maxWidth="sm"
+            maxWidth={false}
             sx={{
                 display: "flex",
                 flexDirection: "column",
@@ -50,4 +49,4 @@ const NotFoundPage = () => {
     );
 };
 
-export default NotFoundPage;
+export default FullPageError;

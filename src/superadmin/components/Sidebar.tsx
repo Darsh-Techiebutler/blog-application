@@ -35,7 +35,6 @@ const Sidebar = () => {
   return (
     <Box
       sx={{
-        width: 240,
         height: '100%',
         backgroundColor: '#f4f4f4',
         position: 'fixed',
@@ -103,16 +102,6 @@ const Sidebar = () => {
                 <PersonAddIcon />
               </ListItemIcon>
               <ListItemText primary="Add User" />
-            </ListItemButton>
-            <ListItemButton
-              component={Link}
-              to="/admin/pending-users"
-              selected={location.pathname === '/admin/pending-users'}
-            >
-              <ListItemIcon>
-                <PendingActionsIcon />
-              </ListItemIcon>
-              <ListItemText primary="Pending Users" />
             </ListItemButton>
           </Box>
         </Collapse>

@@ -3,9 +3,8 @@ import { Box, Grid, useMediaQuery } from '@mui/material';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import { Route, Routes } from 'react-router-dom';
-import UsersList from './components/UsersList';
-import { AddUser } from './components/AddUser'; // Example: Add User component
-import { PendingBlogs } from './components/PendingBlogs'; // Example: Pending Blogs component
+import UsersList from './components/users/UsersList';
+import { AddUser } from './components/users/AddUser'; // Example: Add User component
 
 const SuperAdminDashboard = () => {
   const isMobile = useMediaQuery('(max-width:600px)');
@@ -37,7 +36,6 @@ const SuperAdminDashboard = () => {
               <Route path="/users" element={<UsersList />} />
               <Route path="/add-user" element={<AddUser />} />
               <Route path="/users/:id" element={<AddUser />} />
-              <Route path="/superadmin/pending-blogs" element={<PendingBlogs />} />
               <Route path="*" element={<div>404 - Page Not Found</div>} />
             </Routes>
           </Box>

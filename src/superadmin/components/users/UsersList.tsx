@@ -19,7 +19,7 @@ import {
     Button,
 } from '@mui/material';
 import { styled, Theme } from '@mui/system';
-import HttpService from '../../APIS/superadmin/http_user_Services';
+import HttpService from '../../../APIS/superadmin/http_user_Services';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
