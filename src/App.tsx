@@ -1,75 +1,78 @@
-import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import LoginPage from './pages/LoginPage';
-import { AdminDashboard } from './admin/AdminDashboard';
-import { SuperAdminDashboard } from './superadmin/SuperAdminDashboard';
-import ProtectedRoute from './ProtectedRoute';
-import UsersList  from './superadmin/components/UsersList';  // Assuming UsersList is a separate page
+  import React, { useEffect, useState } from 'react';
+  import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+  import { useDispatch, useSelector } from 'react-redux';
+  import { PersistGate } from 'redux-persist/integration/react';
+  import { ThemeProvider, createTheme } from '@mui/material/styles';
+  import LoginPage from './pages/LoginPage';
+  import ProtectedRoute from './ProtectedRoute';
+  import NotFoundPage from './pages/NotFoundPage';
+  import { AdminDashboard } from './admin/AdminDashboard';
+  import { SuperAdminDashboard } from './superadmin/SuperAdminDashboard';
+  import { ToastContainer } from 'react-toastify'; // Import ToastContainer
+  import { persistor } from './store/store';  // import the store and persistor
 
-const App = () => {
-  const [role, setRole] = useState<string | null>(localStorage.getItem('role'));
-  const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
-  const theme = useSelector((state: any) => state.theme.theme);
-  const dispatch = useDispatch();
+  const App = () => {
+    const dispatch = useDispatch();
+    const [token, setToken] = useState('');
+    const reduxToken = useSelector((state: any) => state.auth.token);
+    useEffect(() => {
+      if (reduxToken) {
+        setToken(reduxToken);
+        localStorage.setItem('token', reduxToken);
+      }
+    }, [reduxToken]);
+    // console.log("redux token", token);
+    const role = useSelector((state: any) => state.auth.role) || localStorage.getItem('role');
+    const themeMode = useSelector((state: any) => state.theme.theme);
 
-  useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    const storedRole = localStorage.getItem('role');
-    if (storedToken && storedRole) {
-      setToken(storedToken);
-      setRole(storedRole);
-    }
-  }, []);
+    useEffect(() => {
+      dispatch({ type: 'INITIALIZE_AUTH' });
+    }, [dispatch]);
 
-  // Define light and dark themes
-  const lightTheme = createTheme({
-    palette: {
-      mode: 'light',
-    },
-  });
+    const theme = createTheme({
+      palette: { mode: themeMode === 'light' ? 'light' : 'dark' },
+    });
 
-  const darkTheme = createTheme({
-    palette: {
-      mode: 'dark',
-    },
-  });
+    return (
 
-  return (
-    <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
-      <Router>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute role="admin" userRole={role} token={token}>
-                <AdminDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/superadmin"
-            element={
-              <ProtectedRoute role="superadmin" userRole={role} token={token}>
-                <SuperAdminDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="superadmin/users"
-            element={
-              <ProtectedRoute role="superadmin" userRole={role} token={token}>
-                <UsersList token={token || ''} />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </Router>
-    </ThemeProvider>
-  );
-};
+      <ThemeProvider theme={theme}>
+        <PersistGate loading={null} persistor={persistor}>
 
-export default App;
+          <ToastContainer />
+          <Router>
+            <Routes>
+              <Route path="/login" element={<LoginPage />} />
+
+              {/* Admin Routes */}
+              <Route
+                path="/admin/*"
+                element={
+                  <ProtectedRoute role="admin" userRole={role} token={token}>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* SuperAdmin Routes */}
+              <Route
+                path="/superadmin/*"
+                element={
+                  <ProtectedRoute role="superadmin" userRole={role} token={token}>
+                    <SuperAdminDashboard />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Unauthorized Route */}
+              <Route path="/unauthorized" element={<div>Unauthorized</div>} />
+
+              {/* Fallback for 404 */}
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </Router>
+        </PersistGate>
+      </ThemeProvider>
+    );
+  };
+
+  export default App;
