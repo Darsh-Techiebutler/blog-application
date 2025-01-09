@@ -23,6 +23,7 @@ import HttpService from '../../APIS/superadmin/http_user_Services';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
+import { CloseFullscreen } from '@mui/icons-material';
 
 interface User {
     id: string;
@@ -92,14 +93,15 @@ const UsersList = () => {
 
                 // Check if the error status is 401 (Unauthorized)
                 if (err.response && err.response.status === 401) {
-                    // Redirect to the login page
-                    navigate('/login'); // Adjust the path to your login page route
+                    navigate('*'); 
                 }
             });
     }, [navigate]);
 
     const handleEdit = (id: string) => {
-        console.log(`Edit user with ID: ${id}`);
+        // Navigate to the edit page (ensure the edit page URL is correct)
+        console.log(id);
+        navigate(`${id}`);
     };
 
     const confirmDelete = (id: string) => {
@@ -114,17 +116,12 @@ const UsersList = () => {
         try {
             await HttpService.del(`/user/delete?id=${deleteUserId}`);
 
-            // Remove the deleted user from the state
-            setUsers(users.filter((user) => user.id !== deleteUserId));
-
-            // Reset the delete user ID
             setDeleteUserId(null);
         } catch (err) {
             console.error('Error deleting user:', err);
             setError('Failed to delete the user. Please try again.');
         }
     };
-
 
     if (loading)
         return (
